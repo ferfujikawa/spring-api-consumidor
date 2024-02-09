@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -35,9 +36,11 @@ public class ConsumidorService implements IConsumidorService {
 
     private String wsEndpointListarPaises;
 
-    private RestTemplate restTemplate;
-
     private String wsEndpointObterHoraDoServidor;
+
+    private String wsEndpointObterFichaConcurso;
+
+    private RestTemplate restTemplate;
 
     public ConsumidorService(
         @Value("${ws.url}") String wsUrl,
@@ -46,6 +49,7 @@ public class ConsumidorService implements IConsumidorService {
         @Value("${ws.endpoints.listarcidades}") String wsEndpointListarCidade,
         @Value("${ws.endpoints.listarpaises}") String wsEndpointListarPaises,
         @Value("${ws.endpoints.obterhoradoservidor}") String wsEndpointObterHoraDoServidor,
+        @Value("${ws.endpoints.obterfichaconcurso}") String wsEndpointObterFichaConcurso,
         RestTemplate restTemplate) {
         this.wsUrl = wsUrl;
         this.wsUsuario = wsUsuario;
@@ -53,6 +57,7 @@ public class ConsumidorService implements IConsumidorService {
         this.wsEndpointListarCidade = wsEndpointListarCidade;
         this.wsEndpointListarPaises = wsEndpointListarPaises;
         this.wsEndpointObterHoraDoServidor = wsEndpointObterHoraDoServidor;
+        this.wsEndpointObterFichaConcurso = wsEndpointObterFichaConcurso;
         this.restTemplate = restTemplate;
     }
 
@@ -105,5 +110,22 @@ public class ConsumidorService implements IConsumidorService {
 		
 		ZonedDateTime dataHoraComTimeZone = response.getBody().withZoneSameInstant(ZoneId.of("America/Sao_Paulo"));
 		return dataHoraComTimeZone.toLocalDateTime();
+    }
+
+    @Override
+    public byte[] obterFichaConcurso(Long inscricaoId) {
+        
+        HttpHeaders header = criarCabecalhoRequisicao();
+        
+        header.setContentType(MediaType.APPLICATION_JSON);
+        header.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
+		
+        ResponseEntity<byte[]> response = restTemplate.exchange(
+				wsUrl + wsEndpointObterFichaConcurso,
+				HttpMethod.POST,
+				new HttpEntity<Long>(inscricaoId, header),
+				byte[].class);
+		
+		return response.getBody();
     }
 }

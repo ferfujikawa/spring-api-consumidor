@@ -13,4 +13,6 @@ public interface IConsumidorService {
     List<PaisDTO> listarPaises(String pesquisa);
 
     LocalDateTime obterHoraDoServidor();
+
+    byte[] obterFichaConcurso(Long inscricaoId);
 }
