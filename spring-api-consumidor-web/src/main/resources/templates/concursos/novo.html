@@ -55,6 +55,9 @@
 							</div>
 							
 							<span class="text-body-secondary">*Auto preenchimento apenas de cidades do Brasil</span>
+
+							<span th:if="${#fields.hasErrors('pais')}" th:errors="*{pais}" class="text-danger"></span>
+							<span th:if="${#fields.hasErrors('cidade')}" th:errors="*{cidade}" class="text-danger"></span>
 						</div>
 					</div>
 
