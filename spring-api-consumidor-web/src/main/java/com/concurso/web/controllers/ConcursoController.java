@@ -1,5 +1,6 @@
 package com.concurso.web.controllers;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -15,17 +16,20 @@ import com.concurso.dominio.dtos.CadastroConcursoDTO;
 import com.concurso.dominio.dtos.ConcursoDTO;
 import com.concurso.dominio.dtos.ObtencaoFichaConcursoDTO;
 import com.concurso.dominio.services.IConcursoService;
-
-
+import com.concurso.dominio.services.IConsumidorService;
 
 @Controller
 @RequestMapping("concursos")
-public class ConcursoController {
+public class ConcursoController extends BaseController {
     
     private IConcursoService concursoService;
+    private IConsumidorService consumidorService;
 
-    public ConcursoController(IConcursoService concursoService) {
+    public ConcursoController(
+        IConcursoService concursoService,
+        IConsumidorService consumidorService) {
         this.concursoService = concursoService;
+        this.consumidorService = consumidorService;
     }
 
     @GetMapping("novo")
@@ -59,5 +63,27 @@ public class ConcursoController {
         redirectAttributes.addFlashAttribute("concursoCadastrado", concursoCadastrado);
 		
 		return "redirect:/concursos/confirmacao-cadastro";
+	}
+
+    @PostMapping("inscricoes")
+	public String obterFichaDeIncricao(
+			@ModelAttribute("obtencaoFicha") @Valid ObtencaoFichaConcursoDTO dto,
+			BindingResult bindingResult,
+			HttpServletResponse response) {
+		
+		if (bindingResult.hasErrors()) {
+			return exibirFormularioObterFicha(dto);
+		}
+		
+		byte[] fichaBytes = consumidorService.obterFichaConcurso(dto.getIdInscricao());
+		
+		String nomeArquivo = "fichaConcurso" + String.format("%03d", dto.getIdInscricao()) + ".pdf";
+		
+		if (!this.anexarPdfEmResponse(nomeArquivo, response, fichaBytes)) {
+			bindingResult.rejectValue("inscricaoId", "obtencaoFicha", "Erro ao baixar ficha");
+			return exibirFormularioObterFicha(dto);
+		}
+		
+		return null;
 	}
 }

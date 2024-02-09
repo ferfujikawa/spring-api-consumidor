@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("paises")
-public class PaisController {
+public class PaisController extends BaseController {
 
     private IConsumidorService consumidorService;
 
