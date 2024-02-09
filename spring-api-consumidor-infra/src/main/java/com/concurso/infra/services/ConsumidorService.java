@@ -1,11 +1,16 @@
 package com.concurso.infra.services;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,10 +23,6 @@ import com.concurso.dominio.services.IConsumidorService;
 public class ConsumidorService implements IConsumidorService {
 
     private String wsUrl;
-	
-	private String wsUsuario;
-	
-	private String wsSenha;
     
     private String wsEndpointListarCidade;
 
@@ -29,19 +30,23 @@ public class ConsumidorService implements IConsumidorService {
 
     private RestTemplate restTemplate;
 
+    private String wsEndpointObterHoraDoServidor;
+
+    private HttpHeaders cabecalhoAutenticado;
+
     public ConsumidorService(
         @Value("${ws.url}") String wsUrl,
-        @Value("${ws.usuario}") String wsUsuario,
-        @Value("${ws.senha}") String wsSenha,
         @Value("${ws.endpoints.listarcidades}") String wsEndpointListarCidade,
         @Value("${ws.endpoints.listarpaises}") String wsEndpointListarPaises,
-        RestTemplate restTemplate) {
+        @Value("${ws.endpoints.obterhoradoservidor}") String wsEndpointObterHoraDoServidor,
+        RestTemplate restTemplate,
+        HttpHeaders cabecalhoAutenticado) {
         this.wsUrl = wsUrl;
-        this.wsUsuario = wsUsuario;
-        this.wsSenha = wsSenha;
         this.wsEndpointListarCidade = wsEndpointListarCidade;
         this.wsEndpointListarPaises = wsEndpointListarPaises;
+        this.wsEndpointObterHoraDoServidor = wsEndpointObterHoraDoServidor;
         this.restTemplate = restTemplate;
+        this.cabecalhoAutenticado = cabecalhoAutenticado;
     }
 
     @Override
@@ -68,5 +73,17 @@ public class ConsumidorService implements IConsumidorService {
 				params);
 		
 		return Arrays.asList(response.getBody());
+    }
+
+    @Override
+    public LocalDateTime obterHoraDoServidor() {
+        
+		ResponseEntity<ZonedDateTime> response = restTemplate.getForEntity(
+				wsUrl + wsEndpointObterHoraDoServidor,
+                ZonedDateTime.class,
+				new HttpEntity<String>(cabecalhoAutenticado));
+		
+		ZonedDateTime dataHoraComTimeZone = response.getBody().withZoneSameInstant(ZoneId.of("America/Sao_Paulo"));
+		return dataHoraComTimeZone.toLocalDateTime();
     }
 }

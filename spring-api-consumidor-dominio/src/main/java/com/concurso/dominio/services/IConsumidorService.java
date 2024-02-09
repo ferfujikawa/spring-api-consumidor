@@ -1,5 +1,6 @@
 package com.concurso.dominio.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.concurso.dominio.dtos.CidadeDTO;
@@ -10,4 +11,6 @@ public interface IConsumidorService {
     List<CidadeDTO> listarCidades(String pesquisa);
 
     List<PaisDTO> listarPaises(String pesquisa);
+
+    LocalDateTime obterHoraDoServidor();
 }
