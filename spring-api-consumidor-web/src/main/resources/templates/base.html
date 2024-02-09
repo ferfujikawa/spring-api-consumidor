@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html th:fragment="layout(title, content)" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:replace="${title}">Concurso API Consumidor</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+	<main class="my-5">
+        <div class="container">
+            <div th:replace="${content}"></div>
+        </div>
+    </main>
+</body>
+</html>
