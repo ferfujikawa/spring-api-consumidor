@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::title}, ~{::section})}">
+<head>
+	<meta charset="UTF-8">
+	<title>Novo Concurso</title>
+</head>
+<body>
+<section>
+
+	<div class="card">
+		<div class="card-header">
+            <h3 class="card-title">Dados do novo concurso</h3>
+	  	</div>
+		<div class="card-body">
+			<form th:action="@{/concursos}" method="POST">
+				<fieldset>
+					<div class="mb-3">
+						<label for="nome" class="form-label">Nome</label>
+  						<input
+  							type="text"
+  							class="form-control"
+  							id="nome"
+  							placeholder="Nome do concurso"
+  							required>
+					</div>
+					
+					<div class="mb-3">
+						<label for="pais" class="form-label">Local</label>
+						
+						<div class="row g-2">
+							<div class="col-auto form-floating">
+								<input
+									class="form-control"
+									id="pais"
+									list="paises"
+									placeholder="País">
+								<label for="pais">País</label>
+								<datalist id="paises">
+								</datalist>
+							</div>
+							
+							<div class="col-auto form-floating">
+								<input
+									class="form-control"
+									list="cidades"
+									id="cidade"
+									placeholder="Cidade*">
+								<label for="cidade">Cidade*</label>
+								<datalist id="cidades">
+								</datalist>
+							</div>
+							
+							<span class="text-body-secondary">*Auto preenchimento apenas de cidades do Brasil</span>
+						</div>
+					</div>
+
+					<div class="mb-3">
+						<input class="btn btn-primary" type="submit" value="Salvar"/>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		debounce = (cb, interval, immediate) => {
+			var timeout;
+			
+			return function() {
+				var context = this, args = arguments;
+				var later = function() {
+				  	timeout = null;
+				  	if (!immediate) cb.apply(context, args);
+				};
+				
+			  	var callNow = immediate && !timeout;
+				
+			  	clearTimeout(timeout);
+			  	timeout = setTimeout(later, interval);
+				
+			  	if (callNow) cb.apply(context, args);
+			};
+		};
+	
+		carregarCidades = (pesquisa) => {
+			
+			$('#cidades').html('');
+			
+            $.ajax({
+                url : "/cidades?pesquisa=" + pesquisa,
+                type:'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $.each(response, (key, value) => {
+                        $('#cidades').append('<option value="' + value.nomeMunicipio + '">' + value.codigoMunicipio + ' - ' + value.nomeMunicipio + '</option>');
+                    });
+                    }
+            });
+		}
+		
+		cidadeKeyUp = (event) => {
+			carregarCidades(event.target.value);
+		}
+	
+		$(document).ready(() => {
+			
+			$('#cidade').keyup(debounce(cidadeKeyUp, 500));
+		});
+	</script>
+</section>
+</body>
+
+</html>
