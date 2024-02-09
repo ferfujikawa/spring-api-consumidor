@@ -1,11 +1,11 @@
 package com.concurso.infra.services;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -39,12 +39,11 @@ public class ConsumidorService implements IConsumidorService {
         
         Map<String, String> params = Collections.singletonMap("pesquisa", pesquisa);
 		
-		ResponseEntity<List<CidadeDTO>> response = restTemplate.getForEntity(
+		ResponseEntity<CidadeDTO[]> response = restTemplate.getForEntity(
             wsUrl + wsEndpointListarCidade + "?query={pesquisa}",
-            null,
-            new ParameterizedTypeReference<List<CidadeDTO>>() {},
+            CidadeDTO[].class,
             params);
-		
-		return response.getBody();
+            
+		return Arrays.asList(response.getBody());
     }
 }
