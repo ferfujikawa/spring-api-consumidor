@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.concurso.dominio.dtos.CadastroConcursoDTO;
 import com.concurso.dominio.dtos.ConcursoDTO;
+import com.concurso.dominio.dtos.ObtencaoFichaConcursoDTO;
 import com.concurso.dominio.services.IConcursoService;
 
 
@@ -36,6 +37,11 @@ public class ConcursoController {
     public String getMethodName(@ModelAttribute("concursoCadastrado") ConcursoDTO concursoCadastrado) {
         return "concursos/confirmacao-cadastro";
     }
+
+    @GetMapping("inscricoes")
+	public String exibirFormularioObterFicha(@ModelAttribute("obtencaoFicha") ObtencaoFichaConcursoDTO dto) {
+		return "concursos/inscricoes";
+	}
 
     @PostMapping
 	public String cadastrarConcurso(
