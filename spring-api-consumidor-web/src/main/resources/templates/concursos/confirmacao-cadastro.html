@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::title}, ~{::section})}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Concurso cadastrado</title>
+</head>
+
+<body>
+
+<section>
+
+	<div class="card">
+		<div class="card-header">
+            <h3 class="card-title">Concurso cadastrado</h3>
+	  	</div>
+		<div class="card-body">
+			<div class="row mb-3">
+				<span class="fw-bold col-sm-2">Nome</span>
+				<span class="col-sm-10" th:text="${concursoCadastrado.nome}"></span>
+			</div>
+			
+			<div class="row mb-3">
+				<span class="fw-bold col-sm-2">Cidade</span>
+				<span class="col-sm-10" th:text="${concursoCadastrado.cidade}"></span>
+			</div>
+			
+			<div class="row mb-3">
+				<span class="fw-bold col-sm-2">País</span>
+				<span class="col-sm-10" th:text="${concursoCadastrado.pais}"></span>
+			</div>
+			
+			<div class="row mb-3">
+				<span class="fw-bold col-sm-2">Data e hora de cadastro</span>
+				<span class="col-sm-10" th:text="${#temporals.format(concursoCadastrado.dataCadastro, 'dd/MM/yyyy HH:mm:ss')}"></span>
+			</div>
+		</div>
+		<div class="card-footer">
+			<strong>O que você pode fazer:</strong>
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item"><a th:href="@{/concursos/novo}">Cadastrar outro concurso</a></li>
+			</ul>
+		</div>
+	</div>
+</section>
+
+</body>
+
+</html>
