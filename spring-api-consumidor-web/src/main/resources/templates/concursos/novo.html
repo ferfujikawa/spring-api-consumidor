@@ -87,25 +87,50 @@
 			
 			$('#cidades').html('');
 			
-            $.ajax({
-                url : "/cidades?pesquisa=" + pesquisa,
-                type:'GET',
-                dataType: 'json',
-                success: function(response) {
-                    $.each(response, (key, value) => {
-                        $('#cidades').append('<option value="' + value.nomeMunicipio + '">' + value.codigoMunicipio + ' - ' + value.nomeMunicipio + '</option>');
-                    });
-                    }
-            });
+			if ($('#pais').val().toUpperCase() === 'BRASIL' && pesquisa.length > 2) {
+				$.ajax({
+					url : "/cidades?pesquisa=" + pesquisa,
+					type:'GET',
+					dataType: 'json',
+					success: function(response) {
+						$.each(response, (key, value) => {
+							$('#cidades').append('<option value="' + value.nomeMunicipio + '">' + value.codigoMunicipio + ' - ' + value.nomeMunicipio + '</option>');
+						});
+						}
+				});
+			}
+		}
+
+		carregarPaises = (pesquisa) => {
+			
+			$('#paises').html('');
+			
+			if (pesquisa.length > 2) {
+				$.ajax({
+		            url : "/paises?pesquisa=" + pesquisa,
+		            type:'GET',
+		            dataType: 'json',
+		            success: function(response) {
+		    			$.each(response, (key, value) => {
+		    				$('#paises').append('<option value="' + value.nomePais + '">' + value.codigoPais + ' - ' + value.nomePais + '</option>');
+		                });
+		             }
+		        });
+			}
 		}
 		
 		cidadeKeyUp = (event) => {
 			carregarCidades(event.target.value);
 		}
+
+		paisKeyUp = (event) => {
+			carregarPaises(event.target.value);
+		}
 	
 		$(document).ready(() => {
 			
 			$('#cidade').keyup(debounce(cidadeKeyUp, 500));
+			$('#pais').keyup(debounce(paisKeyUp, 500));
 		});
 	</script>
 </section>
