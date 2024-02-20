@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.concurso.dominio.dtos.CidadeDTO;
@@ -88,7 +89,7 @@ public class ConsumidorService implements IConsumidorService {
     }
 
     @Override
-    public byte[] obterFichaConcurso(Long inscricaoId) {
+    public byte[] obterFichaConcurso(Long inscricaoId) throws HttpClientErrorException {
         
         HttpHeaders header = criarCabecalhoRequisicao();
         
@@ -96,10 +97,10 @@ public class ConsumidorService implements IConsumidorService {
         header.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
 		
         ResponseEntity<byte[]> response = restTemplate.exchange(
-				wsConfig.getEndpointObterFichaConcurso(),
-				HttpMethod.POST,
-				new HttpEntity<Long>(inscricaoId, header),
-				byte[].class);
+            wsConfig.getEndpointObterFichaConcurso(),
+            HttpMethod.POST,
+            new HttpEntity<Long>(inscricaoId, header),
+            byte[].class);
 		
 		return response.getBody();
     }

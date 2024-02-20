@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.concurso.dominio.dtos.CadastroConcursoDTO;
@@ -75,12 +76,17 @@ public class ConcursoController extends BaseController {
 			return exibirFormularioObterFicha(dto);
 		}
 		
-		byte[] fichaBytes = consumidorService.obterFichaConcurso(dto.getIdInscricao());
+		byte[] fichaBytes;
+		try {
+			fichaBytes = consumidorService.obterFichaConcurso(dto.getIdInscricao());
+		} catch (HttpClientErrorException ex) {
+			bindingResult.rejectValue("idInscricao", "obtencaoFicha", "Informe um número de inscrição válido");
+			return exibirFormularioObterFicha(dto);
+		}
 		
 		String nomeArquivo = "fichaConcurso" + String.format("%03d", dto.getIdInscricao()) + ".pdf";
-		
 		if (!this.anexarPdfEmResponse(nomeArquivo, response, fichaBytes)) {
-			bindingResult.rejectValue("inscricaoId", "obtencaoFicha", "Erro ao baixar ficha");
+			bindingResult.rejectValue("idInscricao", "obtencaoFicha", "Erro ao baixar ficha");
 			return exibirFormularioObterFicha(dto);
 		}
 		
