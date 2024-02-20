@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,48 +21,24 @@ import org.springframework.web.client.RestTemplate;
 import com.concurso.dominio.dtos.CidadeDTO;
 import com.concurso.dominio.dtos.PaisDTO;
 import com.concurso.dominio.services.IConsumidorService;
+import com.concurso.infra.configs.WebServiceConfiguration;
 
 @Service
 public class ConsumidorService implements IConsumidorService {
 
-    private String wsUrl;
-	
-	private String wsUsuario;
-	
-	private String wsSenha;
-    
-    private String wsEndpointListarCidade;
-
-    private String wsEndpointListarPaises;
-
-    private String wsEndpointObterHoraDoServidor;
-
-    private String wsEndpointObterFichaConcurso;
+    private WebServiceConfiguration wsConfig;
 
     private RestTemplate restTemplate;
 
-    public ConsumidorService(
-        @Value("${ws.url}") String wsUrl,
-        @Value("${ws.usuario}") String wsUsuario,
-        @Value("${ws.senha}") String wsSenha,
-        @Value("${ws.endpoints.listarcidades}") String wsEndpointListarCidade,
-        @Value("${ws.endpoints.listarpaises}") String wsEndpointListarPaises,
-        @Value("${ws.endpoints.obterhoradoservidor}") String wsEndpointObterHoraDoServidor,
-        @Value("${ws.endpoints.obterfichaconcurso}") String wsEndpointObterFichaConcurso,
-        RestTemplate restTemplate) {
-        this.wsUrl = wsUrl;
-        this.wsUsuario = wsUsuario;
-        this.wsSenha = wsSenha;
-        this.wsEndpointListarCidade = wsEndpointListarCidade;
-        this.wsEndpointListarPaises = wsEndpointListarPaises;
-        this.wsEndpointObterHoraDoServidor = wsEndpointObterHoraDoServidor;
-        this.wsEndpointObterFichaConcurso = wsEndpointObterFichaConcurso;
+    public ConsumidorService(RestTemplate restTemplate, WebServiceConfiguration wsConfig) {
+        
         this.restTemplate = restTemplate;
+        this.wsConfig = wsConfig;
     }
 
     private HttpHeaders criarCabecalhoRequisicao() {
 		
-		String auth = wsUsuario + ":" + wsSenha;
+		String auth = wsConfig.getUsuario() + ":" + wsConfig.getSenha();
         byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(Charset.forName("US-ASCII")));
         HttpHeaders header = new HttpHeaders();
 		
@@ -77,7 +52,7 @@ public class ConsumidorService implements IConsumidorService {
         Map<String, String> params = Collections.singletonMap("pesquisa", pesquisa);
 		
 		ResponseEntity<CidadeDTO[]> response = restTemplate.getForEntity(
-            wsUrl + wsEndpointListarCidade + "?query={pesquisa}",
+            wsConfig.getEndpointListarCidade() + "?query={pesquisa}",
             CidadeDTO[].class,
             params);
             
@@ -90,7 +65,7 @@ public class ConsumidorService implements IConsumidorService {
         Map<String, String> params = Collections.singletonMap("pesquisa", pesquisa);
 		
 		ResponseEntity<PaisDTO[]> response = restTemplate.getForEntity(
-				wsUrl + wsEndpointListarPaises + "?query={pesquisa}",
+				wsConfig.getEndpointListarPaises() + "?query={pesquisa}",
 				PaisDTO[].class,
 				params);
 		
@@ -103,7 +78,7 @@ public class ConsumidorService implements IConsumidorService {
         HttpHeaders header = criarCabecalhoRequisicao();
 
         ResponseEntity<ZonedDateTime> response = restTemplate.exchange(
-				wsUrl + wsEndpointObterHoraDoServidor,
+				wsConfig.getEndpointObterHoraDoServidor(),
 				HttpMethod.GET,
 				new HttpEntity<String>(header),
 				ZonedDateTime.class);
@@ -121,7 +96,7 @@ public class ConsumidorService implements IConsumidorService {
         header.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
 		
         ResponseEntity<byte[]> response = restTemplate.exchange(
-				wsUrl + wsEndpointObterFichaConcurso,
+				wsConfig.getEndpointObterFichaConcurso(),
 				HttpMethod.POST,
 				new HttpEntity<Long>(inscricaoId, header),
 				byte[].class);
